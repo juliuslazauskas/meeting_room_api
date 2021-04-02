@@ -12,22 +12,23 @@ class UserViewSet(viewsets.ModelViewSet):
     Endpoint that allows users to be creted, viewed, edited, deleted.
     """
     permission_classes = [permissions.IsAuthenticated, IsStaffOrReadPutOnly]
-    
-    #the 'is_staff' user can access additional fields so the viewset gets 
-    #serializer based on users 
+    # the 'is_staff' user can access additional fields so the viewset gets
+    # serializer based on users
+
     def get_serializer_class(self):
         if self.request.user.is_staff:
             return UserAdminSerializer
         return UserSerializer
 
-    #a specific queryset for the User view, user can see himself only
-    #or if user 'is_staff', all records available
+    # a specific queryset for the User view, user can see himself only
+    # or if user 'is_staff', all records available
     def get_queryset(self):
-        if self.request.user.is_staff :
+        if self.request.user.is_staff:
             queryset = User.objects.all()
         else:
             queryset = User.objects.filter(username=self.request.user)
         return queryset
+
 
 class Meeting_roomView(viewsets.ModelViewSet):
     """
@@ -35,12 +36,13 @@ class Meeting_roomView(viewsets.ModelViewSet):
     """
     queryset = Meeting_room.objects.all()
     serializer_class = Meeting_roomSerializer
-    permission_classes = [permissions.IsAuthenticated, 
+    permission_classes = [permissions.IsAuthenticated,
                           IsOwnerOrStaffOrReadOnly]
 
-    #adds the owner of record based on user    
+    # adds the owner of record based on user
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
 
 class BookingView(viewsets.ModelViewSet):
     """
@@ -54,10 +56,10 @@ class BookingView(viewsets.ModelViewSet):
         """
         Optionally restricts the queryset if the query parameters are set
         in the url in the form of:
-        'bookings?first_name=FirstName&last_name=LastName' 
+        'bookings?first_name=FirstName&last_name=LastName'
         """
         queryset = Booking.objects.all()
-        #bookings?first_name=Name&last_name=Last_Name
+        # bookings?first_name=Name&last_name=Last_Name
         first_name = self.request.query_params.get('first_name', None)
         last_name = self.request.query_params.get('last_name', None)
         user = User.objects.filter(first_name=first_name, last_name=last_name)
@@ -67,6 +69,6 @@ class BookingView(viewsets.ModelViewSet):
             raise NotFound('The users name searched does not exist')
         return queryset
 
-    #adds the owner of record based on user 
+    # adds the owner of record based on user
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
