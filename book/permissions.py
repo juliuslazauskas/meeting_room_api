@@ -5,7 +5,7 @@ class IsOwnerOrStaffOrReadOnly(permissions.BasePermission):
     """
     Custom permission to only allow owners of an object to edit it.
     """
-    
+
     def has_object_permission(self, request, view, obj):
         # GET, HEAD or OPTIONS requests are allowed to all
         if request.method in permissions.SAFE_METHODS:
@@ -15,10 +15,11 @@ class IsOwnerOrStaffOrReadOnly(permissions.BasePermission):
         # or 'is_staff' user.
         return obj.owner == request.user or request.user.is_staff
 
+
 class IsStaffOrReadPutOnly(permissions.BasePermission):
 
     def has_permission(self, request, view):
-        #PUT is allowed on the viewset level
+        # PUT is allowed on the viewset level
         if request.method in ('GET', 'HEAD', 'PUT', 'OPTIONS'):
             return True
         return request.user.is_staff
